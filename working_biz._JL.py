@@ -32,6 +32,9 @@ for col in numeric_columns:
         df[col] = df[col].replace(",", "", regex=True)  # Remove commas
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)  # Convert to numeric
 
+# Exclude rows where AC_Name is "Total" or similar
+df = df[df['AC_Name'] != 'Total']
+
 # Validate required column exists
 if 'AC_Name' not in df.columns:
     st.error("The required column 'AC_Name' is missing from the dataset.")
