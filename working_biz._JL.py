@@ -81,7 +81,13 @@ else:
 
 if not filtered_data.empty:
     st.markdown(f'<h2 class="subheader-title">Data for AC_Name: {selected_ac}</h2>', unsafe_allow_html=True)
-    st.dataframe(filtered_data.style.format("{:,.0f}"))
+    # Format numeric columns in the filtered data
+    formatted_data = filtered_data.copy()
+    for col in numeric_columns:
+        if col in formatted_data.columns:
+            formatted_data[col] = formatted_data[col].apply(lambda x: f"{x:,.0f}")
+
+    st.dataframe(formatted_data)
 
     # Summary for Overall Targets and Achievements
     st.markdown('<h2 class="subheader-title">Overall Summary</h2>', unsafe_allow_html=True)
