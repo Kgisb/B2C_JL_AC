@@ -22,29 +22,10 @@ df.columns = df.columns.str.strip()
 st.write("Columns in the dataset:")
 st.write(df.columns.tolist())
 
-# Convert columns to numeric and handle missing data
-numeric_columns = [
-    "WK1_Cash_Target", "WK2_Cash_Target", "WK3_Cash_Target", "WK4_Cash_Target",
-    "WK1_Cash_Achv", "WK2_Cash_Achv", "WK3_Cash_Achv", "WK4_Cash_Achv",
-    "WK1_Enrl_Target", "WK2_Enrl_Target", "WK3_Enrl_Target", "WK4_Enrl_Target",
-    "WK1_Enrl_Achv", "WK2_Enrl_Achv", "WK3_Enrl_Achv", "WK4_Enrl_Achv",
-    "WK1_Self_Ref_Target", "WK2_Self_Ref_Target", "WK3_Self_Ref_Target", "WK4_Self_Ref_Target",
-    "WK1_Self_Ref_Achv", "WK2_Self_Ref_Achv", "WK3_Self_Ref_Achv", "WK4_Self_Ref_Achv",
-]
-
-for col in numeric_columns:
-    if col in df.columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-
-# Derive Overall Targets and Achievements
-df['Overall_Cash_Target'] = df['WK1_Cash_Target'] + df['WK2_Cash_Target'] + df['WK3_Cash_Target'] + df['WK4_Cash_Target']
-df['Overall_Cash_Achv'] = df['WK1_Cash_Achv'] + df['WK2_Cash_Achv'] + df['WK3_Cash_Achv'] + df['WK4_Cash_Achv']
-
-df['Overall_Enrl_Target'] = df['WK1_Enrl_Target'] + df['WK2_Enrl_Target'] + df['WK3_Enrl_Target'] + df['WK4_Enrl_Target']
+# Use correct column names for weekly achievements
+df['Overall_Cash_Achv'] = df['WK1l_Cash_Achv'] + df['WK2_Cash_Achv'] + df['WK3_Cash_Achv'] + df['WK4_Cash_Achv']
 df['Overall_Enrl_Achv'] = df['WK1_Enrl_Achv'] + df['WK2_Enrl_Achv'] + df['WK3_Enrl_Achv'] + df['WK4_Enrl_Achv']
-
-df['Overall_Self_Ref_Target'] = df['WK1_Self_Ref_Target'] + df['WK2_Self_Ref_Target'] + df['WK3_Self_Ref_Target'] + df['WK4_Self_Ref_Target']
-df['Overall_Self_Ref_Achv'] = df['WK1_Self_Ref_Achv'] + df['WK2_Self_Ref_Achv'] + df['WK3_Self_Ref_Achv'] + df['WK4_Self_Ref_Achv']
+df['Overall_SGR_Achv'] = df['WK1_SGR_Achv'] + df['WK2_SGR_Achv'] + df['WK3_SGR_Achv'] + df['WK4_SGR_Achv']
 
 # Validate required column exists
 if 'AC_Name' not in df.columns:
@@ -68,8 +49,8 @@ if not filtered_data.empty:
         "Overall Cash Achieved": filtered_data["Overall_Cash_Achv"].sum(),
         "Overall Enrl. Target": filtered_data["Overall_Enrl_Target"].sum(),
         "Overall Enrl. Achieved": filtered_data["Overall_Enrl_Achv"].sum(),
-        "Overall Self Ref. Target": filtered_data["Overall_Self_Ref_Target"].sum(),
-        "Overall Self Ref. Achieved": filtered_data["Overall_Self_Ref_Achv"].sum(),
+        "Overall SGR Target": filtered_data["Overall_SGR_Target"].sum(),
+        "Overall SGR Achieved": filtered_data["Overall_SGR_Achv"].sum(),
     }
     summary_df = pd.DataFrame([overall_summary])
     st.table(summary_df)
