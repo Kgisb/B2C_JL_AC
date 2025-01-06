@@ -18,10 +18,19 @@ except Exception as e:
 # Clean column names
 df.columns = df.columns.str.strip()
 
-# Use correct column names for weekly achievements
-df['Overall_Cash_Achv'] = df['WK1l_Cash_Achv'] + df['WK2_Cash_Achv'] + df['WK3_Cash_Achv'] + df['WK4_Cash_Achv']
-df['Overall_Enrl_Achv'] = df['WK1_Enrl_Achv'] + df['WK2_Enrl_Achv'] + df['WK3_Enrl_Achv'] + df['WK4_Enrl_Achv']
-df['Overall_SGR_Achv'] = df['WK1_SGR_Achv'] + df['WK2_SGR_Achv'] + df['WK3_SGR_Achv'] + df['WK4_SGR_Achv']
+# Remove commas and convert relevant columns to numeric
+numeric_columns = [
+    "Overall_Cash_Target", "Overall_Enrl_Target", "Overall_SGR_Target",
+    "Overall_Cash_Achv", "Overall_Enrl_Achv", "Overall_SGR_Achv",
+    "WK1l_Cash_Achv", "WK2_Cash_Achv", "WK3_Cash_Achv", "WK4_Cash_Achv",
+    "WK1_Enrl_Achv", "WK2_Enrl_Achv", "WK3_Enrl_Achv", "WK4_Enrl_Achv",
+    "WK1_SGR_Achv", "WK2_SGR_Achv", "WK3_SGR_Achv", "WK4_SGR_Achv",
+]
+
+for col in numeric_columns:
+    if col in df.columns:
+        df[col] = df[col].replace(",", "", regex=True)  # Remove commas
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)  # Convert to numeric
 
 # Validate required column exists
 if 'AC_Name' not in df.columns:
