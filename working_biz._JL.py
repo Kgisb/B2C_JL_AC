@@ -20,12 +20,12 @@ df.columns = df.columns.str.strip()
 
 # Map and rename columns for clarity
 column_mapping = {
-    "Cash-in Target": "Target (Cash-in)",
-    "Target.1": "Target (Enrl.)",
-    "Target.2": "Target (Self. Gen. Ref.)",
-    "Achv (Cash-in)": "Achv (Cash-in)",
-    "Achv.1": "Achv (Enrl.)",
-    "Achv.2": "Achv (Self. Gen. Ref.)",
+    "Dec_Target": "Cash-in Target",
+    "Dec_Target.1": "Enrl. Target",
+    "Dec_Target.2": "Self Gen. Ref. Target",
+    "Dec_Achv": "Cash-in Achieved",
+    "Dec_Achv.1": "Enrl. Achieved",
+    "Dec_Achv.2": "Self Gen. Ref. Achieved",
 }
 df.rename(columns=column_mapping, inplace=True)
 
@@ -51,13 +51,13 @@ if not filtered_data.empty:
 
     # Summarize data for each category and week
     for category, mapped_category in [
-        ("Cash-in", "Target (Cash-in)"),
-        ("Enrl.", "Target (Enrl.)"),
-        ("Self. Gen. Ref.", "Target (Self. Gen. Ref.)"),
+        ("Cash-in", "Cash-in Target"),
+        ("Enrl.", "Enrl. Target"),
+        ("Self Gen. Ref.", "Self Gen. Ref. Target"),
     ]:
         for week in ['WK_1', 'WK_2', 'WK_3', 'WK_4']:
             target_col = f"{mapped_category} {week}"
-            achv_col = f"Achv ({category}) {week}"
+            achv_col = f"{category} Achieved {week}"
             if target_col in filtered_data.columns and achv_col in filtered_data.columns:
                 summary_data[f"{category} {week} Target"] = filtered_data[target_col].sum()
                 summary_data[f"{category} {week} Achieved"] = filtered_data[achv_col].sum()
