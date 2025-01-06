@@ -81,13 +81,6 @@ else:
 
 if not filtered_data.empty:
     st.markdown(f'<h2 class="subheader-title">Data for AC_Name: {selected_ac}</h2>', unsafe_allow_html=True)
-    # Format numeric columns in the filtered data
-    formatted_data = filtered_data.copy()
-    for col in numeric_columns:
-        if col in formatted_data.columns:
-            formatted_data[col] = formatted_data[col].apply(lambda x: f"{x:,.0f}")
-
-    st.dataframe(formatted_data)
 
     # Summary for Overall Targets and Achievements
     st.markdown('<h2 class="subheader-title">Overall Summary</h2>', unsafe_allow_html=True)
@@ -100,12 +93,31 @@ if not filtered_data.empty:
         "Overall SGR Achieved": filtered_data["Overall_SGR_Achv"].sum(),
     }
 
+    # Add percentages
+    percentage_summary = {
+        "Cash Achievement %": (overall_summary["Overall Cash Achieved"] / overall_summary["Overall Cash Target"] * 100)
+        if overall_summary["Overall Cash Target"] > 0 else 0,
+        "Enrl. Achievement %": (overall_summary["Overall Enrl. Achieved"] / overall_summary["Overall Enrl. Target"] * 100)
+        if overall_summary["Overall Enrl. Target"] > 0 else 0,
+        "SGR Achievement %": (overall_summary["Overall SGR Achieved"] / overall_summary["Overall SGR Target"] * 100)
+        if overall_summary["Overall SGR Target"] > 0 else 0,
+    }
+
     # Display summary in a card-like format
     summary_cols = st.columns(3)
     for idx, (key, value) in enumerate(overall_summary.items()):
         with summary_cols[idx % 3]:
             st.markdown(
                 f'<div class="summary-card">{key}:<br>{value:,.0f}</div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown('<h2 class="subheader-title">Achievement Percentages</h2>', unsafe_allow_html=True)
+    percentage_cols = st.columns(3)
+    for idx, (key, value) in enumerate(percentage_summary.items()):
+        with percentage_cols[idx % 3]:
+            st.markdown(
+                f'<div class="summary-card">{key}:<br>{value:.2f}%</div>',
                 unsafe_allow_html=True,
             )
 else:
