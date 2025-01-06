@@ -37,12 +37,17 @@ if 'AC_Name' not in df.columns:
     st.error("The required column 'AC_Name' is missing from the dataset.")
     st.stop()
 
-# Dropdown for selecting an AC_Name
-selected_ac = st.selectbox("Select an AC_Name:", df['AC_Name'].dropna().unique())
+# Add "All" option to the dropdown
+ac_names = ['All'] + sorted(df['AC_Name'].dropna().unique().tolist())
+selected_ac = st.selectbox("Select an AC_Name:", ac_names)
 
 # Filter data for the selected AC_Name
-filtered_data = df[df['AC_Name'] == selected_ac]
+if selected_ac == 'All':
+    filtered_data = df
+else:
+    filtered_data = df[df['AC_Name'] == selected_ac]
 
+# Display the filtered data dynamically
 if not filtered_data.empty:
     st.subheader(f"Data for AC_Name: {selected_ac}")
     st.dataframe(filtered_data)
