@@ -40,51 +40,39 @@ selected_ac = st.selectbox("Select an AC_Name:", df['AC_Name'].dropna().unique()
 # Filter data for the selected AC_Name
 filtered_data = df[df['AC_Name'] == selected_ac]
 
-# Display the filtered data
-st.subheader(f"Data for AC_Name: {selected_ac}")
-
+# Display the filtered data dynamically
 if not filtered_data.empty:
-    # Custom HTML Table with Merged Header
-    html_table = f"""
-    <table style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid black;">
-        <thead>
-            <tr>
-                <th rowspan="2" style="border: 1px solid black; padding: 5px;">AC Name</th>
-                <th colspan="3" style="border: 1px solid black; padding: 5px;">Dec</th>
-                <th rowspan="2" style="border: 1px solid black; padding: 5px;">Cash-in Achieved</th>
-                <th rowspan="2" style="border: 1px solid black; padding: 5px;">Enrl. Achieved</th>
-                <th rowspan="2" style="border: 1px solid black; padding: 5px;">Self Gen. Ref. Achieved</th>
-            </tr>
-            <tr>
-                <th style="border: 1px solid black; padding: 5px;">Cash-in Target</th>
-                <th style="border: 1px solid black; padding: 5px;">Enrl. Target</th>
-                <th style="border: 1px solid black; padding: 5px;">Self Gen. Ref. Target</th>
-            </tr>
-        </thead>
-        <tbody>
-    """
-    # Generate rows dynamically based on the filtered data
-    for _, row in filtered_data.iterrows():
-        html_table += f"""
-            <tr>
-                <td style="border: 1px solid black; padding: 5px;">{row['AC_Name']}</td>
-                <td style="border: 1px solid black; padding: 5px;">{row['Cash-in Target']}</td>
-                <td style="border: 1px solid black; padding: 5px;">{row['Enrl. Target']}</td>
-                <td style="border: 1px solid black; padding: 5px;">{row['Self Gen. Ref. Target']}</td>
-                <td style="border: 1px solid black; padding: 5px;">{row['Cash-in Achieved']}</td>
-                <td style="border: 1px solid black; padding: 5px;">{row['Enrl. Achieved']}</td>
-                <td style="border: 1px solid black; padding: 5px;">{row['Self Gen. Ref. Achieved']}</td>
-            </tr>
-        """
-    html_table += """
-        </tbody>
-    </table>
-    """
-    # Display the custom table
-    st.markdown(html_table, unsafe_allow_html=True)
+    st.subheader(f"Details for AC_Name: {selected_ac}")
 
-    # Summary of Weekly Data (Optional)
-    st.subheader("Weekly Summary")
-    st.write("This can be added if needed for detailed weekly breakdowns.")
+    # Display dynamic details in a styled table
+    st.dataframe(filtered_data)
+
+    # Summary for the selected AC_Name
+    st.subheader("Summary")
+    summary = {
+        "Cash-in Target (Total)": filtered_data["Cash-in Target"].sum(),
+        "Cash-in Achieved (Total)": filtered_data["Cash-in Achieved"].sum(),
+        "Enrl. Target (Total)": filtered_data["Enrl. Target"].sum(),
+        "Enrl. Achieved (Total)": filtered_data["Enrl. Achieved"].sum(),
+        "Self Gen. Ref. Target (Total)": filtered_data["Self Gen. Ref. Target"].sum(),
+        "Self Gen. Ref. Achieved (Total)": filtered_data["Self Gen. Ref. Achieved"].sum(),
+    }
+    summary_df = pd.DataFrame([summary])
+    st.table(summary_df)
+
+    # Optional: Weekly breakdown
+    st.subheader("Weekly Breakdown (Optional)")
+    for week in ["WK_1", "WK_2", "WK_3", "WK_4"]:
+        if any(filtered_data.columns.str.contains(week)):
+            weekly_summary = {
+                f"Cash-in Target {week}": filtered_data.get(f"Cash-in Target {week}", pd.Series(0)).sum(),
+                f"Cash-in Achieved {week}": filtered_data.get(f"Cash-in Achieved {week}", pd.Series(0)).sum(),
+                f"Enrl. Target {week}": filtered_data.get(f"Enrl. Target {week}", pd.Series(0)).sum(),
+                f"Enrl. Achieved {week}": filtered_data.get(f"Enrl. Achieved {week}", pd.Series(0)).sum(),
+                f"Self Gen. Ref. Target {week}": filtered_data.get(f"Self Gen. Ref. Target {week}", pd.Series(0)).sum(),
+                f"Self Gen. Ref. Achieved {week}": filtered_data.get(f"Self Gen. Ref. Achieved {week}", pd.Series(0)).sum(),
+            }
+            st.write(f"Weekly Breakdown for {week}")
+            st.table(pd.DataFrame([weekly_summary]))
 else:
-    st.warning("No data available for the selected AC_Name.")
+    st.warning(f"No data available for the selected AC_Name: {selected_ac}.")
