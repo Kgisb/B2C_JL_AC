@@ -18,10 +18,6 @@ except Exception as e:
 # Clean column names
 df.columns = df.columns.str.strip()
 
-# Display available columns for debugging
-st.write("Columns in the dataset:")
-st.write(df.columns.tolist())
-
 # Use correct column names for weekly achievements
 df['Overall_Cash_Achv'] = df['WK1l_Cash_Achv'] + df['WK2_Cash_Achv'] + df['WK3_Cash_Achv'] + df['WK4_Cash_Achv']
 df['Overall_Enrl_Achv'] = df['WK1_Enrl_Achv'] + df['WK2_Enrl_Achv'] + df['WK3_Enrl_Achv'] + df['WK4_Enrl_Achv']
@@ -52,7 +48,9 @@ if not filtered_data.empty:
         "Overall SGR Target": filtered_data["Overall_SGR_Target"].sum(),
         "Overall SGR Achieved": filtered_data["Overall_SGR_Achv"].sum(),
     }
+    # Format the summary for clean display
     summary_df = pd.DataFrame([overall_summary])
+    summary_df = summary_df.applymap(lambda x: f"{x:,.0f}" if isinstance(x, (int, float)) else x)
     st.table(summary_df)
 else:
     st.warning(f"No data available for the selected AC_Name: {selected_ac}.")
