@@ -4,11 +4,40 @@ import streamlit as st
 # Load data from Google Sheet
 sheet_url = "https://docs.google.com/spreadsheets/d/16U4reJDdvGQb6lqN9LF-A2QVwsJdNBV1CqqcyuHcHXk/export?format=csv&gid=908334443"
 
-st.title("AC Target and Achievement Viewer")
+# Custom Styles
+st.markdown(
+    """
+    <style>
+    .header-title {
+        font-size: 40px;
+        font-weight: bold;
+        color: #1f77b4;
+    }
+    .subheader-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff7f0e;
+    }
+    .summary-card {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #2ca02c;
+        margin-bottom: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Header
+st.markdown('<h1 class="header-title">AC Target and Achievement Viewer</h1>', unsafe_allow_html=True)
 
 # Load the data
 try:
-    # Read the Google Sheet into a DataFrame
     df = pd.read_csv(sheet_url)
     st.success("Data loaded successfully!")
 except Exception as e:
@@ -42,7 +71,7 @@ if 'AC_Name' not in df.columns:
 
 # Add "All" option to the dropdown
 ac_names = ['All'] + sorted(df['AC_Name'].dropna().unique().tolist())
-selected_ac = st.selectbox("Select an AC_Name:", ac_names)
+selected_ac = st.selectbox("Select an AC_Name:", ac_names, help="Choose 'All' to view data for all ACs")
 
 # Filter data for the selected AC_Name
 if selected_ac == 'All':
@@ -50,13 +79,12 @@ if selected_ac == 'All':
 else:
     filtered_data = df[df['AC_Name'] == selected_ac]
 
-# Display the filtered data dynamically
 if not filtered_data.empty:
-    st.subheader(f"Data for AC_Name: {selected_ac}")
-    st.dataframe(filtered_data)
+    st.markdown(f'<h2 class="subheader-title">Data for AC_Name: {selected_ac}</h2>', unsafe_allow_html=True)
+    st.dataframe(filtered_data.style.format("{:,.0f}"))
 
     # Summary for Overall Targets and Achievements
-    st.subheader("Overall Summary")
+    st.markdown('<h2 class="subheader-title">Overall Summary</h2>', unsafe_allow_html=True)
     overall_summary = {
         "Overall Cash Target": filtered_data["Overall_Cash_Target"].sum(),
         "Overall Cash Achieved": filtered_data["Overall_Cash_Achv"].sum(),
@@ -65,9 +93,14 @@ if not filtered_data.empty:
         "Overall SGR Target": filtered_data["Overall_SGR_Target"].sum(),
         "Overall SGR Achieved": filtered_data["Overall_SGR_Achv"].sum(),
     }
-    # Format the summary for clean display
-    summary_df = pd.DataFrame([overall_summary])
-    summary_df = summary_df.applymap(lambda x: f"{x:,.0f}" if isinstance(x, (int, float)) else x)
-    st.table(summary_df)
+
+    # Display summary in a card-like format
+    summary_cols = st.columns(3)
+    for idx, (key, value) in enumerate(overall_summary.items()):
+        with summary_cols[idx % 3]:
+            st.markdown(
+                f'<div class="summary-card">{key}:<br>{value:,.0f}</div>',
+                unsafe_allow_html=True,
+            )
 else:
     st.warning(f"No data available for the selected AC_Name: {selected_ac}.")
