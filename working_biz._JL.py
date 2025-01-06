@@ -18,6 +18,17 @@ except Exception as e:
 # Clean column names
 df.columns = df.columns.str.strip()
 
+# Rename columns for clarity
+column_mapping = {
+    "Cash-in Target": "Target (Cash-in)",
+    "Target.1": "Target (Enrl.)",
+    "Target.2": "Target (Self. Gen. Ref.)",
+    "Achv (Cash-in)": "Achv (Cash-in)",
+    "Achv (Enrl.)": "Achv (Enrl.)",
+    "Achv (Self. Gen. Ref.)": "Achv (Self. Gen. Ref.)",
+}
+df.rename(columns=column_mapping, inplace=True)
+
 # Check if the required column exists
 if 'AC_Name' not in df.columns:
     st.error("The required column 'AC_Name' is missing from the dataset.")
@@ -39,9 +50,13 @@ if not filtered_data.empty:
     summary_data = {}
 
     # Extract relevant columns for summarization
-    for category in ['Cash-in', 'Enrl.', 'Self. Gen. Ref.']:
+    for category, mapped_category in [
+        ("Cash-in", "Target (Cash-in)"),
+        ("Enrl.", "Target (Enrl.)"),
+        ("Self. Gen. Ref.", "Target (Self. Gen. Ref.)"),
+    ]:
         for week in ['WK_1', 'WK_2', 'WK_3', 'WK_4']:
-            target_col = f"Target ({category}) {week}"
+            target_col = f"{mapped_category} {week}"
             achv_col = f"Achv ({category}) {week}"
             if target_col in filtered_data.columns and achv_col in filtered_data.columns:
                 summary_data[f"{category} {week} Target"] = filtered_data[target_col].sum()
