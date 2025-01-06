@@ -22,8 +22,8 @@ df.columns = df.columns.str.strip()
 st.write("Columns in the dataset:")
 st.write(df.columns.tolist())
 
-# Add missing columns if they don't exist
-required_columns = [
+# Convert columns to numeric and handle missing data
+numeric_columns = [
     "WK1_Cash_Target", "WK2_Cash_Target", "WK3_Cash_Target", "WK4_Cash_Target",
     "WK1_Cash_Achv", "WK2_Cash_Achv", "WK3_Cash_Achv", "WK4_Cash_Achv",
     "WK1_Enrl_Target", "WK2_Enrl_Target", "WK3_Enrl_Target", "WK4_Enrl_Target",
@@ -32,9 +32,9 @@ required_columns = [
     "WK1_Self_Ref_Achv", "WK2_Self_Ref_Achv", "WK3_Self_Ref_Achv", "WK4_Self_Ref_Achv",
 ]
 
-for col in required_columns:
-    if col not in df.columns:
-        df[col] = 0  # Add missing column with default value 0
+for col in numeric_columns:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
 
 # Derive Overall Targets and Achievements
 df['Overall_Cash_Target'] = df['WK1_Cash_Target'] + df['WK2_Cash_Target'] + df['WK3_Cash_Target'] + df['WK4_Cash_Target']
